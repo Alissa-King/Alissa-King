@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Projects
-permalink: /work/
+permalink: /Alissa-King/work/
 ---
 
 # My Projects
