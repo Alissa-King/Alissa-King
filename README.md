@@ -1,9 +1,3 @@
----
-layout: default
-title: Home
-permalink: /Alissa-King/
----
-
 ## 👩‍💼 Alissa King - Finance & Data Science Professional
 
 **Empowering Financial Well-being Through Data-Driven Strategies**
