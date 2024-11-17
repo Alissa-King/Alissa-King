@@ -1,3 +1,9 @@
+---
+layout: default
+title: About
+permalink: /about/
+---
+
 ## 👩‍💼 Alissa King - Finance & Data Science Professional
 
 **Empowering Financial Well-being Through Data-Driven Strategies**
