@@ -76,9 +76,3 @@ Here are the projects I’ve worked on, showcasing my skills in data analysis, v
     **Technologies Used:** Python, Pandas, Matplotlib
 
 ---
-
-Learn more about my work or get in touch through the links below:
-
-### Links
-- [About Me](about/)
-- [Contact Me](contact/)
