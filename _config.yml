@@ -6,10 +6,10 @@ plugins:
 # Navigation Links
 nav_links:
   - title: "Home"
-    url: /
+    url: "/Alissa-King/"
   - title: "About"
-    url: /about/
+    url: "/Alissa-King/about/"
   - title: "Projects"
-    url: /work/
+    url: "/Alissa-King/work/"
   - title: "Contact"
-    url: /contact/
+    url: "/Alissa-King/contact/"
