@@ -1,3 +1,15 @@
-remote_theme: pages-themes/cayman@v0.2.0
+title: "My Portfolio"
+theme: jekyll-theme-cayman
 plugins:
   - jekyll-remote-theme
+
+# Navigation Links
+nav_links:
+  - title: "Home"
+    url: /
+  - title: "About"
+    url: /about/
+  - title: "Projects"
+    url: /work/
+  - title: "Contact"
+    url: /contact/
