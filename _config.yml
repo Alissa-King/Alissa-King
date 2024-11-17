@@ -2,14 +2,3 @@ title: "My Portfolio"
 theme: jekyll-theme-cayman
 plugins:
   - jekyll-remote-theme
-
-# Navigation Links
-nav_links:
-  - title: "Home"
-    url: "/Alissa-King/"
-  - title: "About"
-    url: "/Alissa-King/about/"
-  - title: "Projects"
-    url: "/Alissa-King/work/"
-  - title: "Contact"
-    url: "/Alissa-King/contact/"
