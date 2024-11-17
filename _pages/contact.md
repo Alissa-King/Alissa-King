@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Contact
-permalink: /contact/
+permalink: /Alissa-King/contact/
 ---
 
 # Contact Me
