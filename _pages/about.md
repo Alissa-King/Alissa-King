@@ -1,7 +1,7 @@
 ---
 layout: default
 title: About
-permalink: /about/
+permalink: /Alissa-King/about/
 ---
 
 ## 👩‍💼 Alissa King - Finance & Data Science Professional
