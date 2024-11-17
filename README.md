@@ -27,7 +27,7 @@ Dedicated finance professional with a passion for leveraging data science to dri
 
 **Education:**
 
-* **Masters in Data Science** (In Progress), Bellevue University
+* **Masters in Data Science**, Bellevue University
 * **Masters in Strategic Finance**, Bellevue University
 * **Bachelors in Liberal Studies**, Oregon State University
 
