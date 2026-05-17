@@ -56,14 +56,14 @@ export default function SolarSystemOrrery() {
   const planetPositionsRef = useRef<{ x: number; y: number; planet: Planet }[]>([]);
   const simDateRef = useRef<Date>(new Date());
 
-  const [speed, setSpeed] = useState(1000);
+  // speed = days per real second; stored as log10 for slider
+  const [sliderVal, setSliderVal] = useState(2); // 10^2 = 100 days/s default
   const [paused, setPaused] = useState(false);
   const [simDate, setSimDate] = useState(new Date());
   const [tooltip, setTooltip] = useState<TooltipInfo | null>(null);
   const [canvasSize, setCanvasSize] = useState(500);
 
-  // Keep refs in sync
-  useEffect(() => { speedRef.current = speed; }, [speed]);
+  // Keep paused ref in sync
   useEffect(() => { pausedRef.current = paused; }, [paused]);
 
   const getOrbitRadius = useCallback((a: number, maxAU: number, maxR: number) => {
@@ -82,11 +82,11 @@ export default function SolarSystemOrrery() {
     const maxR = size / 2 - 20;
     const maxAU = 30.07;
 
-    // Advance simulated time
+    // Advance simulated time (speedRef = days per real second)
     const now = Date.now();
     if (!pausedRef.current) {
-      const dtReal = now - lastRealRef.current;
-      simTimeRef.current += dtReal * speedRef.current;
+      const dtReal = now - lastRealRef.current; // ms
+      simTimeRef.current += dtReal * speedRef.current * 86400; // convert days→ms
     }
     lastRealRef.current = now;
 
@@ -255,45 +255,85 @@ export default function SolarSystemOrrery() {
     }
   }, []);
 
+  const daysPerSec = Math.pow(10, sliderVal);
+
+  const setSpeedTo = (days: number) => {
+    const log = Math.log10(days);
+    setSliderVal(log);
+    speedRef.current = days; // update ref immediately — don't wait for effect
+  };
+
   const togglePause = () => {
-    if (!pausedRef.current) {
-      lastRealRef.current = Date.now();
-    }
+    lastRealRef.current = Date.now(); // reset timer so no jump on resume
     setPaused((v) => !v);
+  };
+
+  const formatSpeed = (d: number) => {
+    if (d >= 365) return `${(d / 365).toFixed(1)} yr/s`;
+    if (d >= 30)  return `${(d / 30).toFixed(1)} mo/s`;
+    if (d >= 1)   return `${d.toFixed(1)} day/s`;
+    return `${(d * 24).toFixed(1)} hr/s`;
   };
 
   return (
     <div className="space-y-4">
       {/* Controls */}
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-wrap items-center gap-3">
         <button
           onClick={togglePause}
           className={`px-4 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
             paused
-              ? "bg-sky-500/15 text-sky-300 border-sky-500/30 hover:bg-sky-500/25"
+              ? "bg-sky-500/15 text-sky-300 border-sky-500/30"
               : "bg-slate-800/60 text-slate-300 border-slate-700 hover:bg-slate-700/60"
           }`}
         >
           {paused ? "▶ Resume" : "⏸ Pause"}
         </button>
 
-        <div className="flex items-center gap-3 flex-1 min-w-0 max-w-xs">
-          <span className="text-xs text-slate-500 shrink-0">Speed</span>
+        {/* Speed presets */}
+        <div className="flex items-center gap-1">
+          {[
+            { label: "1 day/s",  days: 1    },
+            { label: "1 mo/s",   days: 30   },
+            { label: "1 yr/s",   days: 365  },
+            { label: "10 yr/s",  days: 3650 },
+          ].map(({ label, days }) => (
+            <button
+              key={label}
+              onClick={() => setSpeedTo(days)}
+              className={`px-2.5 py-1 rounded text-[10px] font-semibold border transition-all ${
+                Math.abs(daysPerSec - days) < days * 0.05
+                  ? "bg-sky-500/15 text-sky-300 border-sky-500/30"
+                  : "text-slate-500 border-slate-800 hover:text-slate-300 hover:border-slate-600"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Log-scale slider */}
+        <div className="flex items-center gap-2 flex-1 min-w-[140px] max-w-xs">
           <input
             type="range"
-            min={1}
-            max={100000}
-            step={1}
-            value={speed}
-            onChange={(e) => setSpeed(Number(e.target.value))}
-            className="flex-1 accent-sky-400"
+            min={-1}
+            max={4}
+            step={0.02}
+            value={sliderVal}
+            onChange={(e) => {
+              const log = Number(e.target.value);
+              const days = Math.pow(10, log);
+              setSliderVal(log);
+              speedRef.current = days; // update ref immediately
+            }}
+            className="flex-1 accent-sky-400 cursor-pointer"
           />
-          <span className="text-xs text-slate-400 font-mono w-16 shrink-0">
-            {speed >= 86400 ? `${(speed / 86400).toFixed(1)}d/s` : speed >= 3600 ? `${(speed / 3600).toFixed(1)}h/s` : `${speed}x`}
+          <span className="text-xs text-sky-300 font-mono w-20 shrink-0 text-right">
+            {formatSpeed(daysPerSec)}
           </span>
         </div>
 
-        <div className="text-xs text-slate-400 font-mono ml-auto">
+        <div className="text-xs text-slate-500 font-mono ml-auto">
           {simDate.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
         </div>
       </div>

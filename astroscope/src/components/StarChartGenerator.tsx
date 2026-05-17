@@ -261,12 +261,20 @@ export default function StarChartGenerator() {
     ctx.fillText(`${lat}°, ${lon}° · ${date} ${time}`, 10, size - 18);
   }, [lat, lon, date, time]);
 
-  const generate = () => {
+  // Draw whenever generated flips to true or params change after first generate
+  const [drawTrigger, setDrawTrigger] = useState(0);
+  useEffect(() => {
+    if (!generated) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    if (canvas.width !== canvasSize) { canvas.width = canvasSize; canvas.height = canvasSize; }
-    setGenerated(true);
+    canvas.width = canvasSize;
+    canvas.height = canvasSize;
     drawChart(canvasSize);
+  }, [drawTrigger, generated, canvasSize, drawChart]);
+
+  const generate = () => {
+    setGenerated(true);
+    setDrawTrigger((n) => n + 1); // force effect to re-run even if already generated
   };
 
   const handlePrint = () => window.print();
@@ -344,20 +352,26 @@ export default function StarChartGenerator() {
           </div>
         </div>
 
-        {/* Canvas */}
+        {/* Canvas — always mounted so ref is available when generate() fires */}
         <div ref={containerRef} className="w-full flex justify-center">
-          {!generated ? (
-            <div className="w-full max-w-[560px] aspect-square rounded-full border border-slate-800/60 bg-slate-950/60 flex items-center justify-center">
-              <p className="text-slate-600 text-sm">Configure parameters above and click Generate Chart</p>
-            </div>
-          ) : (
+          <div className="relative" style={{ width: canvasSize, height: canvasSize }}>
             <canvas
               id="star-chart-canvas"
               ref={canvasRef}
               className="rounded-full"
-              style={{ width: canvasSize, height: canvasSize }}
+              style={{ width: canvasSize, height: canvasSize, display: generated ? "block" : "none" }}
             />
-          )}
+            {!generated && (
+              <div
+                className="rounded-full border border-slate-800/60 bg-slate-950/60 flex items-center justify-center"
+                style={{ width: canvasSize, height: canvasSize }}
+              >
+                <p className="text-slate-600 text-sm text-center px-8">
+                  Configure parameters above<br />and click Generate Chart
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Legend */}
