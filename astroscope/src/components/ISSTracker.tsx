@@ -1,140 +1,96 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { Satellite, Gauge, ArrowUpRight, Clock, Globe } from "lucide-react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { Satellite, Gauge, ArrowUpRight, Clock, Globe, Info } from "lucide-react";
 import type { ISSPosition } from "@/lib/nasa";
 
-function latStr(lat: number) {
-  return `${Math.abs(lat).toFixed(4)}° ${lat >= 0 ? "N" : "S"}`;
-}
-function lonStr(lon: number) {
-  return `${Math.abs(lon).toFixed(4)}° ${lon >= 0 ? "E" : "W"}`;
-}
+function latStr(lat: number) { return `${Math.abs(lat).toFixed(4)}° ${lat >= 0 ? "N" : "S"}`; }
+function lonStr(lon: number) { return `${Math.abs(lon).toFixed(4)}° ${lon >= 0 ? "E" : "W"}`; }
 
-function ISSGlobe({ lat, lon }: { lat: number; lon: number }) {
-  // Map lat/lon to SVG coordinates on a 400x200 equirectangular projection
+function ISSGlobe({ lat, lon, trail }: { lat: number; lon: number; trail: Array<{lat: number; lon: number}> }) {
   const x = ((lon + 180) / 360) * 400;
   const y = ((90 - lat) / 180) * 200;
 
+  // Build trail path
+  const trailPath = trail.length > 1
+    ? trail.map((p, i) => {
+        const px = ((p.lon + 180) / 360) * 400;
+        const py = ((90 - p.lat) / 180) * 200;
+        return `${i === 0 ? "M" : "L"} ${px} ${py}`;
+      }).join(" ")
+    : null;
+
   return (
-    <div className="relative w-full overflow-hidden rounded-xl border border-emerald-500/20 bg-slate-950">
-      <svg
-        viewBox="0 0 400 200"
-        className="w-full"
-        style={{ aspectRatio: "2/1" }}
-        xmlns="http://www.w3.org/2000/svg"
-      >
+    <div className="relative w-full overflow-hidden rounded-xl border border-emerald-500/15 bg-slate-950">
+      <svg viewBox="0 0 400 200" className="w-full" style={{ aspectRatio: "2/1" }}>
         {/* Ocean */}
-        <rect width="400" height="200" fill="#050a14" />
+        <defs>
+          <radialGradient id="oceanGrad" cx="50%" cy="50%" r="70%">
+            <stop offset="0%" stopColor="#050f22" />
+            <stop offset="100%" stopColor="#020810" />
+          </radialGradient>
+          <linearGradient id="trailGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#10b981" stopOpacity="0" />
+            <stop offset="100%" stopColor="#10b981" stopOpacity="0.6" />
+          </linearGradient>
+        </defs>
+        <rect width="400" height="200" fill="url(#oceanGrad)" />
 
-        {/* Grid lines */}
-        {[-60, -30, 0, 30, 60].map((lat) => {
-          const y = ((90 - lat) / 180) * 200;
-          return (
-            <line
-              key={lat}
-              x1="0"
-              y1={y}
-              x2="400"
-              y2={y}
-              stroke="#1e3a5f"
-              strokeWidth="0.5"
-            />
-          );
+        {/* Subtle star points */}
+        {[[20,15],[60,8],[110,5],[200,3],[300,12],[350,7],[380,18],[15,45],[90,40],[240,38],[340,35]].map(([sx, sy], i) => (
+          <circle key={i} cx={sx} cy={sy} r="0.6" fill="white" opacity="0.4" />
+        ))}
+
+        {/* Grid */}
+        {[-60, -30, 0, 30, 60].map((lt) => {
+          const gy = ((90 - lt) / 180) * 200;
+          return <line key={lt} x1="0" y1={gy} x2="400" y2={gy} stroke="#0d2240" strokeWidth={lt === 0 ? "0.8" : "0.3"} />;
         })}
-        {[-120, -60, 0, 60, 120].map((lon) => {
-          const x = ((lon + 180) / 360) * 400;
-          return (
-            <line
-              key={lon}
-              x1={x}
-              y1="0"
-              x2={x}
-              y2="200"
-              stroke="#1e3a5f"
-              strokeWidth="0.5"
-            />
-          );
+        {[-120, -60, 0, 60, 120].map((ln) => {
+          const gx = ((ln + 180) / 360) * 400;
+          return <line key={ln} x1={gx} y1="0" x2={gx} y2="200" stroke="#0d2240" strokeWidth="0.3" />;
         })}
+        <line x1="0" y1="100" x2="400" y2="100" stroke="#0f2840" strokeWidth="0.6" />
 
-        {/* Equator highlight */}
-        <line x1="0" y1="100" x2="400" y2="100" stroke="#1e3a5f" strokeWidth="1" />
+        {/* Continents */}
+        <path d="M60,35 L82,28 L97,38 L102,55 L92,76 L86,92 L74,96 L63,82 L54,70 L50,54Z" fill="#0c2240" stroke="#1a3a65" strokeWidth="0.6" />
+        <path d="M79,96 L96,90 L108,102 L112,122 L106,148 L96,157 L84,150 L77,133 L74,112Z" fill="#0c2240" stroke="#1a3a65" strokeWidth="0.6" />
+        <path d="M168,28 L192,24 L202,33 L196,46 L183,51 L168,46Z" fill="#0c2240" stroke="#1a3a65" strokeWidth="0.6" />
+        <path d="M173,50 L202,44 L218,56 L222,82 L216,112 L205,127 L190,130 L177,122 L169,96 L167,70Z" fill="#0c2240" stroke="#1a3a65" strokeWidth="0.6" />
+        <path d="M200,22 L262,18 L312,27 L332,40 L322,62 L297,72 L260,66 L233,72 L214,60 L200,44Z" fill="#0c2240" stroke="#1a3a65" strokeWidth="0.6" />
+        <path d="M244,72 L276,68 L310,75 L330,88 L325,110 L305,122 L272,118 L248,100Z" fill="#0c2240" stroke="#1a3a65" strokeWidth="0.6" />
+        <path d="M296,110 L332,104 L348,116 L350,132 L340,142 L315,144 L297,133Z" fill="#0c2240" stroke="#1a3a65" strokeWidth="0.6" />
+        {/* Greenland */}
+        <path d="M95,12 L115,8 L125,15 L122,28 L108,32 L95,25Z" fill="#0c2240" stroke="#1a3a65" strokeWidth="0.4" />
 
-        {/* Simplified continental outlines (very rough) */}
-        {/* North America */}
-        <path
-          d="M60,35 L80,30 L95,38 L100,55 L90,75 L85,90 L75,95 L65,80 L55,70 L50,55 Z"
-          fill="#0d2a47"
-          stroke="#1e4d80"
-          strokeWidth="0.5"
-        />
-        {/* South America */}
-        <path
-          d="M80,95 L95,90 L105,100 L110,120 L105,145 L95,155 L85,148 L78,130 L75,110 Z"
-          fill="#0d2a47"
-          stroke="#1e4d80"
-          strokeWidth="0.5"
-        />
-        {/* Europe */}
-        <path
-          d="M170,28 L190,25 L200,32 L195,45 L182,50 L170,45 Z"
-          fill="#0d2a47"
-          stroke="#1e4d80"
-          strokeWidth="0.5"
-        />
-        {/* Africa */}
-        <path
-          d="M175,50 L200,45 L215,55 L220,80 L215,110 L205,125 L190,128 L178,120 L170,95 L168,70 Z"
-          fill="#0d2a47"
-          stroke="#1e4d80"
-          strokeWidth="0.5"
-        />
-        {/* Asia */}
-        <path
-          d="M200,25 L260,20 L310,28 L330,40 L320,60 L295,70 L260,65 L235,70 L215,58 L200,45 Z"
-          fill="#0d2a47"
-          stroke="#1e4d80"
-          strokeWidth="0.5"
-        />
-        {/* Australia */}
-        <path
-          d="M295,110 L330,105 L345,115 L348,130 L338,140 L315,142 L298,132 Z"
-          fill="#0d2a47"
-          stroke="#1e4d80"
-          strokeWidth="0.5"
-        />
+        {/* ISS orbit ellipse */}
+        <ellipse cx="200" cy="100" rx="198" ry="57" fill="none" stroke="#10b981" strokeWidth="0.8"
+          strokeDasharray="5 4" opacity="0.3" />
 
-        {/* ISS orbit path (simplified ellipse at ISS inclination ~51.6°) */}
-        <ellipse
-          cx="200"
-          cy="100"
-          rx="198"
-          ry="57"
-          fill="none"
-          stroke="#34d399"
-          strokeWidth="0.8"
-          strokeDasharray="4 3"
-          opacity="0.4"
-        />
+        {/* Trail */}
+        {trailPath && (
+          <path d={trailPath} fill="none" stroke="url(#trailGrad)" strokeWidth="1.5" opacity="0.5" />
+        )}
 
-        {/* ISS position marker */}
-        <circle cx={x} cy={y} r="6" fill="#34d399" opacity="0.25" />
-        <circle cx={x} cy={y} r="3.5" fill="#34d399" />
-        <circle cx={x} cy={y} r="1.5" fill="white" />
+        {/* ISS glow rings */}
+        <circle cx={x} cy={y} r="14" fill="#10b981" opacity="0.06" />
+        <circle cx={x} cy={y} r="9"  fill="#10b981" opacity="0.1" />
+        <circle cx={x} cy={y} r="5"  fill="#10b981" opacity="0.3" />
+        <circle cx={x} cy={y} r="3"  fill="#10b981" opacity="0.9" />
+        <circle cx={x} cy={y} r="1.2" fill="white" />
 
-        {/* Label */}
-        <text
-          x={x + 8}
-          y={y - 8}
-          fill="#34d399"
-          fontSize="8"
-          fontFamily="monospace"
-          fontWeight="bold"
-        >
+        {/* ISS label */}
+        <text x={Math.min(x + 8, 370)} y={Math.max(y - 8, 10)} fill="#10b981" fontSize="8" fontFamily="monospace" fontWeight="bold">
           ISS
         </text>
+
+        {/* Coord labels */}
+        <text x="2" y="198" fill="#1a3a65" fontSize="6" fontFamily="monospace">
+          {latStr(lat)} · {lonStr(lon)}
+        </text>
       </svg>
-      <div className="absolute bottom-2 right-3 text-xs text-slate-600 font-mono">
+
+      <div className="absolute bottom-2 right-3 text-[9px] text-slate-700 font-mono">
         Equirectangular projection
       </div>
     </div>
@@ -146,6 +102,7 @@ export default function ISSTracker() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [pass, setPass] = useState(0);
+  const trail = useRef<Array<{ lat: number; lon: number }>>([]);
 
   const fetchPosition = useCallback(async () => {
     try {
@@ -156,6 +113,8 @@ export default function ISSTracker() {
       setLastUpdate(new Date());
       setPass((p) => p + 1);
       setError(null);
+      // Keep last 20 positions for trail
+      trail.current = [...trail.current.slice(-19), { lat: data.latitude, lon: data.longitude }];
     } catch {
       setError("Unable to reach ISS tracking service");
     }
@@ -170,10 +129,10 @@ export default function ISSTracker() {
   if (error) {
     return (
       <div className="glass-card rounded-2xl p-8 text-center">
-        <p className="text-red-400">{error}</p>
+        <p className="text-red-400 mb-4">{error}</p>
         <button
           onClick={fetchPosition}
-          className="mt-4 px-4 py-2 rounded-lg bg-emerald-500/20 text-emerald-400 text-sm hover:bg-emerald-500/30 transition-colors"
+          className="px-4 py-2 rounded-lg bg-emerald-500/20 text-emerald-400 text-sm hover:bg-emerald-500/30 transition-colors"
         >
           Retry
         </button>
@@ -183,86 +142,94 @@ export default function ISSTracker() {
 
   if (!position) {
     return (
-      <div className="glass-card rounded-2xl p-12 text-center text-slate-500 animate-pulse">
-        Acquiring ISS signal...
+      <div className="space-y-4">
+        <div className="skeleton rounded-xl w-full" style={{ aspectRatio: "2/1" }} />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[1,2,3,4].map(i => <div key={i} className="skeleton h-16 rounded-xl" />)}
+        </div>
       </div>
     );
   }
 
   const stats = [
-    {
-      icon: Globe,
-      label: "Latitude",
-      value: latStr(position.latitude),
-      color: "text-emerald-400",
-    },
-    {
-      icon: Globe,
-      label: "Longitude",
-      value: lonStr(position.longitude),
-      color: "text-emerald-400",
-    },
-    {
-      icon: ArrowUpRight,
-      label: "Altitude",
-      value: `${position.altitude.toFixed(1)} km`,
-      color: "text-sky-400",
-    },
-    {
-      icon: Gauge,
-      label: "Velocity",
-      value: `${(position.velocity).toFixed(0)} km/h`,
-      color: "text-amber-400",
-    },
+    { icon: Globe,        label: "Latitude",  value: latStr(position.latitude),               color: "text-emerald-400" },
+    { icon: Globe,        label: "Longitude", value: lonStr(position.longitude),               color: "text-emerald-400" },
+    { icon: ArrowUpRight, label: "Altitude",  value: `${position.altitude.toFixed(1)} km`,    color: "text-sky-400"     },
+    { icon: Gauge,        label: "Velocity",  value: `${position.velocity.toFixed(0)} km/h`,  color: "text-amber-400"   },
   ];
 
+  const orbitNumber = Math.floor((Date.now() / 1000 - 978307200) / (92 * 60)) % 100000;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Globe visualization */}
-      <ISSGlobe lat={position.latitude} lon={position.longitude} />
+      <ISSGlobe lat={position.latitude} lon={position.longitude} trail={trail.current} />
 
       {/* Stats grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {stats.map(({ icon: Icon, label, value, color }) => (
           <div key={label} className="glass-card rounded-xl p-4">
-            <div className="flex items-center gap-1.5 text-slate-500 text-xs mb-2">
-              <Icon size={12} />
+            <div className="flex items-center gap-1.5 text-slate-600 text-xs mb-2">
+              <Icon size={11} />
               {label}
             </div>
-            <div className={`text-lg font-bold font-mono ${color}`}>{value}</div>
+            <div className={`text-base font-bold font-mono ${color} leading-tight`}>{value}</div>
           </div>
         ))}
       </div>
 
-      {/* Meta */}
-      <div className="glass-card rounded-xl p-4 flex flex-wrap items-center justify-between gap-3 text-sm">
+      {/* Status bar */}
+      <div className="glass-card rounded-xl p-4 flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2 text-slate-400">
-          <Satellite size={16} className="text-emerald-400" />
-          International Space Station — NORAD ID 25544
+          <Satellite size={14} className="text-emerald-400" />
+          <span>International Space Station</span>
+          <span className="text-slate-700">·</span>
+          <span className="font-mono text-slate-600">NORAD 25544</span>
         </div>
-        <div className="flex items-center gap-4 text-xs text-slate-600">
+        <div className="flex items-center gap-4 text-slate-600">
           <span className="flex items-center gap-1">
-            <Clock size={12} />
-            {lastUpdate?.toLocaleTimeString() ?? "—"}
+            <Clock size={11} />
+            <span className="font-mono">{lastUpdate?.toLocaleTimeString() ?? "—"}</span>
           </span>
-          <span className="text-emerald-500/60">
+          <span className="flex items-center gap-1 text-emerald-500/60">
+            <span className="w-1 h-1 rounded-full bg-emerald-400 animate-twinkle-fast" />
             Poll #{pass}
           </span>
         </div>
       </div>
 
-      {/* Orbital facts */}
+      {/* Orbital parameters */}
       <div className="grid sm:grid-cols-3 gap-4">
         {[
-          { label: "Orbital period", value: "~92 min" },
-          { label: "Orbits per day", value: "~15.5" },
-          { label: "Inclination", value: "51.6°" },
-        ].map(({ label, value }) => (
+          { label: "Orbital period",    value: "~92 min",        note: "one complete orbit" },
+          { label: "Daily orbits",      value: "~15.5",          note: "per 24-hour day"   },
+          { label: "Inclination",       value: "51.6°",          note: "to the equator"    },
+        ].map(({ label, value, note }) => (
           <div key={label} className="glass-card rounded-xl p-4 text-center">
-            <div className="text-xl font-bold text-emerald-400">{value}</div>
-            <div className="text-xs text-slate-500 mt-1">{label}</div>
+            <div className="text-xl font-bold text-emerald-400 data-readout">{value}</div>
+            <div className="text-xs font-medium text-slate-400 mt-1">{label}</div>
+            <div className="text-[10px] text-slate-600 mt-0.5">{note}</div>
           </div>
         ))}
+      </div>
+
+      {/* Crew / mission info */}
+      <div className="glass-card rounded-xl p-5 border-l-4 border-emerald-500/30">
+        <div className="flex items-start gap-2">
+          <Info size={13} className="text-emerald-400 mt-0.5 shrink-0" />
+          <div className="text-xs text-slate-400 leading-relaxed space-y-1">
+            <p>
+              The ISS orbits at approximately <span className="text-emerald-400">408 km</span> altitude
+              at a speed of <span className="text-emerald-400">7.66 km/s</span> (27,600 km/h).
+              It completes one orbit every 92 minutes, meaning the crew experiences
+              <span className="text-emerald-400"> 16 sunrises and sunsets per day</span>.
+            </p>
+            <p className="text-slate-600">
+              Position data via <span className="text-sky-500">wheretheiss.at</span> ·
+              Updates every 5 seconds · Orbit approximate (equatorial projection).
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
