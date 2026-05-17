@@ -27,7 +27,7 @@ export default function SkyPage() {
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">Tonight&apos;s Sky</h1>
         <p className="text-slate-400 max-w-2xl text-sm leading-relaxed">
-          Real-time star map showing the sky as it appears tonight from mid-northern latitudes (~40°N).
+          Real-time star map showing the sky as it appears tonight from Eugene, Oregon (44°N, 123°W).
           Stars are placed using actual Right Ascension and Declination coordinates with your current
           Local Sidereal Time. Hover over bright stars to identify them.
         </p>
@@ -43,13 +43,13 @@ export default function SkyPage() {
             </p>
           </div>
           <div className="hidden sm:flex flex-col items-end text-xs text-slate-600 gap-1">
-            <span>Observer: 40°N 74°W</span>
+            <span>Observer: Eugene, OR · 44°N 123°W</span>
             <span>Altitude rings: 30° / 60°</span>
           </div>
         </div>
 
         <Suspense fallback={<StarMapSkeleton />}>
-          <StarMap lat={40} lon={-74} />
+          <StarMap lat={44.05} lon={-123.09} />
         </Suspense>
       </div>
 

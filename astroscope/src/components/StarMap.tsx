@@ -154,7 +154,7 @@ type TooltipState = {
   star: StarScreen;
 } | null;
 
-export default function StarMap({ lat = 40, lon = -74 }: { lat?: number; lon?: number }) {
+export default function StarMap({ lat = 44.05, lon = -123.09 }: { lat?: number; lon?: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [tooltip, setTooltip] = useState<{ x: number; y: number; star: StarScreen } | null>(null);
   const [showConstellations, setShowConstellations] = useState(true);

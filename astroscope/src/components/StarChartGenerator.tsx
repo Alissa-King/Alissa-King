@@ -113,8 +113,8 @@ export default function StarChartGenerator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [lat, setLat] = useState(40);
-  const [lon, setLon] = useState(-74);
+  const [lat, setLat] = useState(44.05);
+  const [lon, setLon] = useState(-123.09);
   const [date, setDate] = useState(todayStr());
   const [time, setTime] = useState("22:00");
   const [generated, setGenerated] = useState(false);
