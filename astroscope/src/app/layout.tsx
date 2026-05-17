@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
+import StarfieldBackground from "@/components/StarfieldBackground";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -21,8 +22,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="min-h-screen flex flex-col text-slate-200 antialiased">
-        {/* Static star field */}
-        <div className="star-field" />
+        {/* Animated canvas starfield with constellations */}
+        <StarfieldBackground />
 
         {/* Animated nebula blobs */}
         <div className="nebula-layer" aria-hidden="true">
