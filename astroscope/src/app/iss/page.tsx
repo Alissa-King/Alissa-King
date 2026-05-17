@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import ISSTracker from "@/components/ISSTracker";
+import ISSCrew from "@/components/ISSCrew";
 import { Satellite } from "lucide-react";
 
 export const metadata = {
@@ -37,6 +38,30 @@ export default function ISSPage() {
       >
         <ISSTracker />
       </Suspense>
+
+      {/* Crew Panel */}
+      <div className="mt-8">
+        <Suspense
+          fallback={
+            <div className="glass-card rounded-2xl p-6">
+              <div className="skeleton h-4 w-40 rounded mb-4" />
+              <div className="space-y-3">
+                {[1,2,3].map(i => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="skeleton w-10 h-10 rounded-full" />
+                    <div className="flex-1 space-y-1.5">
+                      <div className="skeleton h-3 w-32 rounded" />
+                      <div className="skeleton h-2.5 w-24 rounded" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          }
+        >
+          <ISSCrew />
+        </Suspense>
+      </div>
 
       {/* Spotting guide */}
       <div className="mt-10 grid sm:grid-cols-2 gap-5">
