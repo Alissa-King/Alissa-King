@@ -15,8 +15,8 @@ Dedicated finance professional with a passion for leveraging data science to dri
 
 **Experience Highlights:**
 
-* **Compassionate Consulting (Founder/CFO/Financial Resources Consultant):** Providing personalized financial coaching and educational resources to empower underserved populations.
-* **HIV Alliance (Finance Director/CFO):** Currently managing full financial operations for a $17M budget, including budgeting, financial reporting, and compliance for a nonprofit organization dedicated to HIV prevention and care services.
+* **HIV Alliance (Finance Director):** Currently managing full financial operations for a $15M budget, including budgeting, financial reporting, and compliance for a nonprofit organization dedicated to HIV prevention and care services.
+* * **Compassionate Consulting (Founder/Financial Resources Consultant):** Providing personalized financial coaching and educational resources to empower underserved populations.
 * **Head Start of Lane County (Finance Director/CFO):** Oversaw financial operations for a $17M annual budget, implemented cost-saving measures, and improved departmental efficiency.
 * **Head Start of Lane County (Accounting Specialist):** Ensured compliance with financial policies and procedures, collaborated with auditors, and resolved discrepancies.
 
