@@ -28,7 +28,7 @@ Dedicated finance professional with a passion for leveraging data science to dri
 **Let's Connect!**
 
 * 📧 alissaking16@gmail.com
-* 💼 [www.linkedin.com/in/alissaking](www.linkedin.com/in/alissaking)
+* 💼 [www.linkedin.com/in/alissaking](https://www.linkedin.com/in/alissaking)
 
 **I'm passionate about using my skills to make a positive impact. Let's work together to achieve your financial goals!**
 
